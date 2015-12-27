@@ -1,0 +1,19 @@
+﻿{
+	"version": "1.0.0-*",
+	"description": "Middleware for ImageResizer (http://imageresizing.net/) for Full .NET Framework only",
+	"authors": [ "Cammac Apps" ],
+	"tags": [ "" ],
+	"projectUrl": "",
+	"licenseUrl": "https://opensource.org/licenses/MIT",
+
+	"dependencies": {
+		"Microsoft.AspNet.Http": "1.0.0-rc1-final",
+		"ImageResizer": "4.0.4",
+		"ImageResizer.Plugins.PrettyGifs": "4.0.4",
+		"Microsoft.AspNet.Hosting.Abstractions": "1.0.0-rc1-final"
+	},
+
+	"frameworks": {
+		"net46": { }
+	}
+}
