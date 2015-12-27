@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ImageResizer;
+using ImageResizer.Plugins.PrettyGifs;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
-using ImageResizer.Plugins.PrettyGifs;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using ImageResizer;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Cammac.ImageResizingMIddleware
 {
