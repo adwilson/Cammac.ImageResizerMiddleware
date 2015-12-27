@@ -12,11 +12,22 @@ namespace Microsoft.AspNet.Builder
 		/// Starts the image resizer middleware. Place before UseStaticFiles() and UseMvc().
 		/// </summary>
 		/// <param name="builder"></param>
-		/// <param name="wwwrootRelative404Paths">A list of paths to the 404 images, they must be relative to the wwwroot folder in the format "/img/404.jpg" (note the first slash).</param>
+		/// <param name="options"></param>
 		/// <returns></returns>
-		public static IApplicationBuilder UseImageResizerMiddleware(this IApplicationBuilder builder, IEnumerable<string> wwwrootRelative404Paths)
+		public static IApplicationBuilder UseImageResizerMiddleware(this IApplicationBuilder builder, Action<ImageResizerOptions> options)
 		{
-			return builder.UseMiddleware<ImageResizerMiddleware>(wwwrootRelative404Paths);
+			return builder.UseMiddleware<ImageResizerMiddleware>(options);
+		}
+
+		/// <summary>
+		/// Starts the image resizer middleware. Place before UseStaticFiles() and UseMvc().
+		/// </summary>
+		/// <param name="builder"></param>
+		/// <returns></returns>
+		public static IApplicationBuilder UseImageResizerMiddleware(this IApplicationBuilder builder)
+		{
+			Action<ImageResizerOptions> optsAction = (opts) => { };
+			return builder.UseMiddleware<ImageResizerMiddleware>(optsAction);
 		}
 	}
 }

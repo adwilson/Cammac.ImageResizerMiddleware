@@ -7,7 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Mvc;
 
 namespace Cammac.ImageResizingMIddleware
 {
@@ -16,53 +18,49 @@ namespace Cammac.ImageResizingMIddleware
 		private readonly static string[] _imageFileTypes = { ".jpg", ".jpeg", ".png", ".gif" };
 
 		private readonly ImageResizer.Configuration.Config _config = new ImageResizer.Configuration.Config();
-		private readonly IEnumerable<string> _wwwrootRelative404Paths;
-		private readonly int _numberOf404Paths;
-		private readonly bool _hasMultiple404Paths;
-		private readonly Random _random;
 
 		private readonly IHostingEnvironment _hostEnv;
 		private readonly RequestDelegate _next;
+		private readonly Action<ImageResizerOptions> _options;
+		private readonly IUrlHelper _urlHelper;
 
 		public ImageResizerMiddleware(RequestDelegate next,
 			IHostingEnvironment hostEnv,
-			IEnumerable<string> wwwrootRelative404Paths)
+			IUrlHelper urlHelper,
+			Action<ImageResizerOptions> options)
 		{
 			_next = next;
 			_hostEnv = hostEnv;
-			_wwwrootRelative404Paths = wwwrootRelative404Paths;
-			_numberOf404Paths = _wwwrootRelative404Paths.Count();
-			_hasMultiple404Paths = _numberOf404Paths > 1;
-			if (_hasMultiple404Paths)
-			{
-				_random = new Random();
-			}
+			_urlHelper = urlHelper;
+			_options = options;
 			new PrettyGifs().Install(_config);
 		}
 
 		public async Task Invoke(HttpContext httpContext)
 		{
+			ImageResizerOptions irOpts = new ImageResizerOptions();
+			_options(irOpts);
 			var req = httpContext.Request;
 			if (_imageFileTypes.Any(x => req.Path.Value.EndsWith(x, StringComparison.OrdinalIgnoreCase)) && req.Query.Any())
 			{
-				string phsyicalPath = GetPhysicalPath(req.Path.Value);
-				if (!File.Exists(phsyicalPath))
+				string physicalPath = GetPhysicalPath(req.Path.Value);
+				if (!File.Exists(physicalPath))
 				{
-					if (_hasMultiple404Paths)
+					if (!string.IsNullOrEmpty(irOpts.Image404))
 					{
-						var useAt = _random.Next(_numberOf404Paths);
-						phsyicalPath = GetPhysicalPath(_wwwrootRelative404Paths.ElementAt(useAt));
+						physicalPath = GetPhysicalPath(_urlHelper.Content(irOpts.Image404));
 					}
 					else
 					{
-						phsyicalPath = GetPhysicalPath(_wwwrootRelative404Paths.First());
+						httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
+						return;
 					}
 				}
 				var outStream = new MemoryStream();
 				try
 				{
 					var parsableQs = req.QueryString.Value.Trim('?').Replace('&', ';');
-					var job = new ImageJob(phsyicalPath, outStream, new Instructions(parsableQs));
+					var job = new ImageJob(physicalPath, outStream, new Instructions(parsableQs));
 					_config.Build(job);
 					string ext = req.Path.Value.Substring(req.Path.Value.LastIndexOf('.')).ToLowerInvariant();
 					string mimeType = "application/octet-stream";

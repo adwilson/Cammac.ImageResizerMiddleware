@@ -10,7 +10,8 @@
 		"Microsoft.AspNet.Http": "1.0.0-rc1-final",
 		"ImageResizer": "4.0.4",
 		"ImageResizer.Plugins.PrettyGifs": "4.0.4",
-		"Microsoft.AspNet.Hosting.Abstractions": "1.0.0-rc1-final"
+		"Microsoft.AspNet.Hosting.Abstractions": "1.0.0-rc1-final",
+		"Microsoft.AspNet.Mvc.Core": "6.0.0-rc1-final"
 	},
 
 	"frameworks": {
